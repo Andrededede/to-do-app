@@ -1,0 +1,143 @@
+.todo-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-card);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 0;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  min-height: 70px;
+}
+
+.todo-card:not(.dragging):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.todo-card.dragging {
+  background-color: rgba(0, 200, 83, 0.05);
+  border: 2px dashed var(--primary-color);
+  box-shadow: none;
+}
+
+.todo-card.dragging .todo-content,
+.todo-card.dragging .todo-actions {
+  opacity: 0;
+}
+
+.todo-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: default;
+  flex: 1;
+  padding-right: 15px;
+  transition: opacity 0.2s;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+  margin: -2px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.icon-wrapper:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.icon-check {
+  color: var(--primary-color);
+  min-width: 24px;
+  height: 24px;
+}
+
+.icon-circle {
+  color: var(--text-muted);
+  min-width: 24px;
+  height: 24px;
+}
+
+.todo-title {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 1rem;
+  word-break: break-word;
+  width: 100%;
+  cursor: grab;
+  padding: 8px 0;
+}
+
+.todo-title:active {
+  cursor: grabbing;
+}
+
+.todo-edit-input {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid var(--primary-color);
+  padding: 4px 0;
+  outline: none;
+  width: 100%;
+}
+
+.completed .todo-title {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.completed .todo-title > span {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 55%,
+    var(--text-muted) 55%,
+    var(--text-muted) calc(55% + 2px),
+    transparent calc(55% + 2px)
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.todo-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 100%;
+  transition: opacity 0.2s;
+}
+
+.icon-edit,
+.icon-trash,
+.icon-save,
+.icon-cancel {
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.icon-edit:hover {
+  color: var(--text-primary);
+}
+.icon-trash:hover {
+  color: #ff4444;
+}
+
+.icon-save:hover {
+  color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.icon-cancel:hover {
+  color: #ff4444;
+  transform: scale(1.1);
+}
