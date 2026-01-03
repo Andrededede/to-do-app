@@ -6,6 +6,10 @@
 
 > Uma aplicação de gerenciamento de tarefas focada em **Arquitetura de Software**, **Clean Code** e **UI/UX refinada**.
 
+## 🎨 Preview
+
+![Demo da Aplicação](./public/demo.gif)
+
 ## 📖 Sobre o Projeto
 
 Este projeto foi desenvolvido como parte de um estudo de Engenharia de Software (IFCE 2025.2) para comparar arquiteturas de frontend. O objetivo principal foi implementar o padrão **MVVM (Model-View-ViewModel)** em React, garantindo uma estrita separação de responsabilidades.
