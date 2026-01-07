@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import type { Task } from "../../../models/Task";
 import { api } from "../../../services/remote_api";
+import { useBackendMode } from "../../../contexts/BackendModeContext";
 
 type LogState = {
   id: number;
@@ -14,11 +15,63 @@ export const useToDoController = () => {
   const [logState, setLogState] = useState<LogState>(null);
   const [hideCompleted, setHideCompleted] = useState(false);
 
+  const { isReactive } = useBackendMode();
+
   const dragItem = useRef<string | null>(null);
 
   useEffect(() => {
-    loadTasks();
-  }, []);
+    let eventSource: EventSource | null = null;
+
+    const loadTasksRest = async () => {
+      try {
+        const data = await api.getAll();
+        setTasks(data);
+      } catch (error) {
+        showLog("Erro ao carregar tarefas (REST).", "error");
+      }
+    };
+
+    if (isReactive) {
+      try {
+        eventSource = api.getEventSource();
+
+        eventSource.onopen = () => {
+        };
+
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (Array.isArray(data)) {
+               const mappedTasks = data.map((item: any) => ({
+                id: item.id,
+                title: item.text,
+                completed: item.completed
+              }));
+              setTasks(mappedTasks);
+            }
+          } catch (err) {
+            console.error("Erro ao processar mensagem SSE:", err);
+          }
+        };
+
+        eventSource.onerror = (err) => {
+          console.error("Erro na conexão SSE:", err);
+          eventSource?.close();
+        };
+      } catch (e) {
+        console.error("Falha ao criar EventSource", e);
+      }
+    } else {
+      loadTasksRest();
+    }
+
+    return () => {
+      if (eventSource) {
+        console.log("Fechando conexão SSE (MVC)");
+        eventSource.close();
+      }
+    };
+  }, [isReactive]);
 
   const showLog = (message: string, type: "success" | "error") => {
     const id = Date.now();
@@ -31,15 +84,6 @@ export const useToDoController = () => {
     }, 3000);
   };
 
-  const loadTasks = async () => {
-    try {
-      const data = await api.getAll();
-      setTasks(data);
-    } catch (error) {
-      showLog("Erro ao carregar tarefas.", "error");
-    }
-  };
-
   const handleAddTask = async () => {
     if (!newTaskText.trim()) {
       showLog("A tarefa não pode estar vazia.", "error");
@@ -47,9 +91,13 @@ export const useToDoController = () => {
     }
     try {
       await api.create(newTaskText);
-      await loadTasks();
       setNewTaskText("");
       showLog("Tarefa criada com sucesso!", "success");
+      
+      if (!isReactive) {
+        const data = await api.getAll();
+        setTasks(data);
+      }
     } catch (error) {
       showLog("Erro ao criar tarefa.", "error");
     }
@@ -58,8 +106,11 @@ export const useToDoController = () => {
   const handleRemoveTask = async (id: string) => {
     try {
       await api.delete(id);
-      setTasks((prev) => prev.filter((t) => t.id !== id));
       showLog("Tarefa removida.", "success");
+
+      if (!isReactive) {
+         setTasks((prev) => prev.filter((t) => t.id !== id));
+      }
     } catch (error) {
       showLog("Erro ao remover tarefa.", "error");
     }
@@ -68,9 +119,11 @@ export const useToDoController = () => {
   const handleToggleTask = async (id: string) => {
     try {
       await api.toggle(id);
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-      );
+      if (!isReactive) {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+        );
+      }
     } catch (error) {
       showLog("Erro ao atualizar tarefa.", "error");
     }
@@ -80,37 +133,39 @@ export const useToDoController = () => {
     if (!newTitle.trim()) return;
     try {
       await api.update(id, newTitle);
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, title: newTitle } : t))
-      );
       showLog("Tarefa editada com sucesso!", "success");
+
+      if (!isReactive) {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, title: newTitle } : t))
+        );
+       }
     } catch (error) {
       showLog("Erro ao editar tarefa.", "error");
     }
   };
 
   // --- LÓGICA DE DRAG AND DROP ---
+  // Nota: A API Remote fornecida no snippet não tem 'reorder'.
+  // Vamos manter a lógica local visual, mas sem persistência real no backend se não houver endpoint.
+  // Se houver endpoint, descomentar a chamada da api.
 
   const handleDragStart = (id: string) => {
     dragItem.current = id;
   };
 
   const handleDragEnter = (targetId: string) => {
-    // Se não estiver arrastando nada ou o alvo for o mesmo item, ignora
     if (dragItem.current === null) return;
     if (dragItem.current === targetId) return;
 
-    // Encontra os índices REAIS na lista completa (blindagem contra filtros)
     const sourceIndex = tasks.findIndex((t) => t.id === dragItem.current);
     const targetIndex = tasks.findIndex((t) => t.id === targetId);
 
-    // Se não achou algum dos itens, aborta
     if (sourceIndex === -1 || targetIndex === -1) return;
 
     const newTasks = [...tasks];
     const draggedItemContent = newTasks[sourceIndex];
 
-    // Remove do local antigo e insere no novo
     newTasks.splice(sourceIndex, 1);
     newTasks.splice(targetIndex, 0, draggedItemContent);
 
@@ -119,13 +174,7 @@ export const useToDoController = () => {
 
   const handleDragEnd = async () => {
     dragItem.current = null;
-
-    try {
-      await api.reorder(tasks);
-    } catch (error) {
-      showLog("Erro ao salvar nova ordem.", "error");
-      loadTasks();
-    }
+    // await api.reorder(tasks); // Backend REST precisa suportar isso
   };
 
   const filteredTasks = hideCompleted

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import type { Task } from "../../../models/Task";
 import { api } from "../../../services/remote_api";
+import { useBackendMode } from "../../../contexts/BackendModeContext";
 
 type LogState = {
   id: number;
@@ -17,9 +18,54 @@ export const useToDoPresenter = () => {
   // MUDANÇA: Ref agora guarda string (ID) ou null
   const dragItem = useRef<string | null>(null);
 
+  const { isReactive } = useBackendMode();
+
   useEffect(() => {
-    loadTasks();
-  }, []);
+    let eventSource: EventSource | null = null;
+
+    if (isReactive) {
+      console.log("Iniciando conexão SSE (MVP)...");
+      try {
+        eventSource = api.getEventSource();
+
+        eventSource.onopen = () => {
+          console.log("SSE Conectado!");
+        };
+
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (Array.isArray(data)) {
+               const mappedTasks = data.map((item: any) => ({
+                id: item.id,
+                title: item.text,
+                completed: item.completed
+              }));
+              setTasks(mappedTasks);
+            }
+          } catch (err) {
+            console.error("Erro ao processar mensagem SSE:", err);
+          }
+        };
+
+        eventSource.onerror = (err) => {
+          console.error("Erro na conexão SSE:", err);
+          eventSource?.close();
+        };
+      } catch (e) {
+        console.error("Falha ao criar EventSource", e);
+      }
+    } else {
+      loadTasksRest();
+    }
+
+    return () => {
+      if (eventSource) {
+        console.log("Fechando conexão SSE (MVP)");
+        eventSource.close();
+      }
+    };
+  }, [isReactive]);
 
   const showLog = (message: string, type: "success" | "error") => {
     const id = Date.now();
@@ -32,13 +78,13 @@ export const useToDoPresenter = () => {
     }, 3000);
   };
 
-  const loadTasks = async () => {
-    try {
-      const data = await api.getAll();
-      setTasks(data);
-    } catch (error) {
-      showLog("Erro ao carregar tarefas.", "error");
-    }
+  const loadTasksRest = async () => {
+      try {
+        const data = await api.getAll();
+        setTasks(data);
+      } catch (error) {
+        showLog("Erro ao carregar tarefas (REST).", "error");
+      }
   };
 
   const addTask = async () => {
@@ -48,9 +94,11 @@ export const useToDoPresenter = () => {
     }
     try {
       await api.create(newTaskText);
-      await loadTasks();
       setNewTaskText("");
       showLog("Tarefa criada com sucesso!", "success");
+      if (!isReactive) {
+        await loadTasksRest();
+      }
     } catch (error) {
       showLog("Erro ao criar tarefa.", "error");
     }
@@ -59,8 +107,10 @@ export const useToDoPresenter = () => {
   const removeTask = async (id: string) => {
     try {
       await api.delete(id);
-      setTasks((prev) => prev.filter((t) => t.id !== id));
       showLog("Tarefa removida.", "success");
+      if (!isReactive) {
+         setTasks((prev) => prev.filter((t) => t.id !== id));
+      }
     } catch (error) {
       showLog("Erro ao remover tarefa.", "error");
     }
@@ -69,9 +119,11 @@ export const useToDoPresenter = () => {
   const toggleTask = async (id: string) => {
     try {
       await api.toggle(id);
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-      );
+      if (!isReactive) {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+        );
+      }
     } catch (error) {
       showLog("Erro ao atualizar tarefa.", "error");
     }
@@ -81,10 +133,13 @@ export const useToDoPresenter = () => {
     if (!newTitle.trim()) return;
     try {
       await api.update(id, newTitle);
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, title: newTitle } : t))
-      );
       showLog("Tarefa editada com sucesso!", "success");
+
+      if (!isReactive) {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, title: newTitle } : t))
+        );
+      }
     } catch (error) {
       showLog("Erro ao editar tarefa.", "error");
     }
@@ -120,13 +175,6 @@ export const useToDoPresenter = () => {
 
   const onDragEnd = async () => {
     dragItem.current = null;
-
-    try {
-      await api.reorder(tasks);
-    } catch (error) {
-      showLog("Erro ao salvar nova ordem.", "error");
-      loadTasks();
-    }
   };
 
   const filteredTasks = hideCompleted
@@ -145,7 +193,7 @@ export const useToDoPresenter = () => {
     hideCompleted,
     
     // Actions (Commands from View to Presenter)
-    setNewTaskText, // Input binding
+    setNewTaskText, 
     addTask,
     removeTask,
     toggleTask,

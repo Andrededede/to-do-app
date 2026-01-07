@@ -63,5 +63,10 @@ export const api = {
       method: 'DELETE'
     });
     if (!response.ok) throw new Error('Erro ao deletar tarefa');
+  },
+
+  // Reactive Source Factory
+  getEventSource: () => {
+    return new EventSource(`${API_URL}/events`);
   }
 };
