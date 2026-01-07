@@ -1,6 +1,7 @@
 import  {type Task}  from '../models/Task.ts';
 
-const API_URL = 'https://eng-soft-backend.onrender.com/todos'; 
+const API_URL = 'https://eng-soft-backend.onrender.com/todos';
+const REACTIVE_API_URL = 'https://eng-soft-backend.onrender.com/events';
 
 export const api = {
   // Buscar todas as tarefas
@@ -67,6 +68,6 @@ export const api = {
 
   // Reactive Source Factory
   getEventSource: () => {
-    return new EventSource(`${API_URL}/events`);
+    return new EventSource(REACTIVE_API_URL);
   }
 };
