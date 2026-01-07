@@ -4,11 +4,13 @@
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
 
-> Um laboratório prático de Engenharia de Software demonstrando três padrões arquiteturais distintos aplicados à mesma aplicação.
+## 🎨 Preview
+
+![Demo da Aplicação](./public/demo.gif)
 
 ## 🎯 Objetivo do Projeto
 
-Este repositório unifica três implementações diferentes de um **To-Do App**, cada uma seguindo estritamente um padrão arquitetural clássico. O objetivo é comparar como **MVC**, **MVP** e **MVVM** resolvem os mesmos problemas de separação de responsabilidades (SoC) e fluxo de dados, utilizando React como base.
+Este projeto foi desenvolvido como parte de um estudo de Engenharia de Software (IFCE 2025.2) para comparar arquiteturas de frontend. Este repositório unifica três implementações diferentes de um **To-Do App**, cada uma seguindo estritamente um padrão arquitetural clássico. O objetivo é comparar como **MVC**, **MVP** e **MVVM** resolvem os mesmos problemas de separação de responsabilidades (SoC) e fluxo de dados, utilizando React como base.
 
 A estrutura foi desenhada para permitir a comparação direta:
 *   Muda-se a arquitetura (/mvc, /mvp, /mvvm).
