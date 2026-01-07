@@ -1,71 +1,80 @@
-# To-Do App - Arquitetura MVP com React
+# Comparativo de Arquiteturas Frontend (MVC, MVP, MVVM) com React
 
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
 
-Este projeto foi desenvolvido como parte de um estudo de Engenharia de Software (IFCE 2025.2) para comparar arquiteturas de frontend. O objetivo principal foi implementar o padrão arquitetural **MVP (Model-View-Presenter)**.
+> Um laboratório prático de Engenharia de Software demonstrando três padrões arquiteturais distintos aplicados à mesma aplicação.
 
-O objetivo é separar estritamente a camada de apresentação (View) da lógica de negócios e estado (Presenter).
+## 🎯 Objetivo do Projeto
 
-## 📦 Como rodar o projeto
+Este repositório unifica três implementações diferentes de um **To-Do App**, cada uma seguindo estritamente um padrão arquitetural clássico. O objetivo é comparar como **MVC**, **MVP** e **MVVM** resolvem os mesmos problemas de separação de responsabilidades (SoC) e fluxo de dados, utilizando React como base.
 
-1. Clone o repositório.
-2. Instale as dependências:
-   ```bash
-   npm install
-   ```
-3. Execute o servidor de desenvolvimento:
-   ```bash
-   npm run dev
-   ```
+A estrutura foi desenhada para permitir a comparação direta:
+*   Muda-se a arquitetura (/mvc, /mvp, /mvvm).
+*   A View (UI/CSS) e o Model (Dados/API) permanecem praticamente idênticos.
+*   Apenas a camada de **orquestração** muda.
 
-## ✨ Funcionalidades
+## 🏗️ As Três Arquiteturas
 
-* ✅ **CRUD Completo:** Criar, Ler, Atualizar e Deletar tarefas.
-* ✋ **Drag and Drop Nativo:** Reordenação de tarefas com feedback visual.
-* 🌙 **Dark/Light Mode:** Tema persistente com variáveis CSS nativas.
-* 🔍 **Filtros:** Alternar visualização entre todas as tarefas ou pendentes.
-* 🔔 **Feedback Visual:** Sistema de Toasts (notificações) para sucesso e erro.
-* 📱 **Responsivo:** Layout fluido que se adapta a diferentes tamanhos de tela.
+### 1. MVC (Model-View-Controller)
+*   **Rota:** `/mvc`
+*   **Características:** A View é passiva e envia comandos para o Controller. O Model é a fonte da verdade e o Controller decide como alterá-lo.
+*   **Mapeamento de Papéis:**
+    *   **Model:** `Task.ts` (estado).
+    *   **View:** `ToDoPageMVC.tsx` (Interface Gráfica que consome o Model para desenhar e chama métodos do Controller).
+    *   **Controller:** `useToDoController.ts` (Recebe inputs da View, processa lógica e atualiza o Model).
 
-## 🏗️ Arquitetura (MVP)
+### 2. MVP (Model-View-Presenter)
+*   **Rota:** `/mvp`
+*   **Características:** O Presenter é um intermediário total. A View não acessa o Model diretamente. Tudo passa pelo Presenter.
+*   **Mapeamento de Papéis:**
+    *   **Model:** `Task.ts`.
+    *   **View:** `ToDoPageMVP.tsx` (Apenas exibe o que o Presenter manda e repassa eventos de clique).
+    *   **Presenter:** `useToDoPresenter.ts` (Busca dados do Model, formata para a View e gerencia a lógica de apresentação).
 
-1. A **View** é passiva e delega todas as ações do usuário para o Presenter.
-2. O **Presenter** contém a lógica de decisões, atualiza o Model e decide o que a View deve exibir.
-3. O **Model** define a estrutura dos dados.
+### 3. MVVM (Model-View-ViewModel)
+*   **Rota:** `/mvvm`
+*   **Características:** Focado no *Data Binding*. A ViewModel expõe propriedades observáveis que representam o estado da View.
+*   **Mapeamento de Papéis:**
+    *   **Model:** `local_api.ts` + `Task.ts`.
+    *   **View:** `ToDoPageMVVM.tsx` (Se conecta/observa as variáveis da ViewModel).
+    *   **ViewModel:** `useToDoViewModel.ts` (Mantém o estado da tela sincronizado e expõe comandos).
 
-A organização do código reflete a separação de responsabilidades:
+## 🚀 Como Rodar
 
-```
+1.  Clone este repositório.
+2.  Instale as dependências:
+    ```bash
+    npm install
+    ```
+3.  Rode o servidor de desenvolvimento:
+    ```bash
+    npm run dev
+    ```
+4.  Acesse `http://localhost:5173`. Você pode navegar entre as versões alterando a URL:
+    *   `http://localhost:5173/mvc`
+    *   `http://localhost:5173/mvvm`
+    *   `http://localhost:5173/mvp`
+
+## 📂 Estrutura de pastas
+
+```text
 src/
-├── models/             # (M) Model
-│   └── Task.ts         # Definição das interfaces de dados (Task)
-│
-├── pages/
-│   └── to-do/
-│       ├── ToDoPage.tsx        # (V) View Principal
-│       ├── useToDoPresenter.ts # (P) Presenter (Lógica e Estado)
-│       └── to-do-card/         # (V) Componentes visuais
-│
-└── ...
+├── architectures/   # Divisao das arquiteturas
+│   ├── mvc/         # Implementação via Controller
+│   ├── mvp/         # Implementação via Presenter
+│   └── mvvm/        # Implementação via ViewModel
+├── models/          # Entidades compartilhadas (Task.ts) 
+├── services/        # Backend 
+└── App.tsx          # Roteamento entre as arquiteturas
 ```
 
-### 🧩 Papéis na Implementação:
+## ✨ Funcionalidades (Comuns a todas as versões)
 
-#### 1. Model (`Task.ts`)
-Responsável apenas pelas definições de tipo e estrutura dos dados. Não contém lógica de UI nem regras de negócio complexas.
-
-#### 2. View (`ToDoPage.tsx`)
-*   **Responsabilidade:** Renderizar a interface gráfica e capturar eventos do usuário.
-*   **Comportamento:** É uma "View Passiva". Ela não toma decisões.
-    *   Recebe dados prontos do Presenter e delega eventos (cliques, inputs) através de comandos imperativos (ex: `presenter.addTask()`).
-
-#### 3. Presenter (`useToDoPresenter.ts`)
-*   **Responsabilidade:** Atua como o "cérebro" da tela.
-*   **Comportamento:**
-    *   Gerencia o Estado da Aplicação (Tasks, Inputs, Filtros).
-    *   Contém as Regras de Negócio (Validação de input, lógica de ordenação, persistência).
-    *   Expõe uma interface pública com **Ações** (`addTask`, `removeTask`) e **Estado** final para a View.
+*   ✅ **CRUD Completo:** Criar, Ler, Atualizar e Deletar tarefas.
+*   ✋ **Drag and Drop:** Reordenação de tarefas.
+*   🌙 **Dark/Light Mode:** Tema persistente.
+*   🔍 **Filtros:** Todas/Pendentes.
 
 ---
