@@ -6,7 +6,7 @@ import { ToDoLog } from "./to-do-log/ToDoLog";
 import { Plus, ListChecks, Sun, Moon, Filter } from "lucide-react";
 import "./to-do-page.css";
 
-export const ToDoPage: React.FC = () => {
+export const ToDoPageMVVM: React.FC = () => {
   const vm = useToDoViewModel();
   const { isDark, toggleTheme } = useTheme();
 
