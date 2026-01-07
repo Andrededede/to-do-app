@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import type { Task } from "../../../models/Task";
-import { api } from "../../../services/local_api";
+import { api } from "../../../services/remote_api";
 
 type LogState = {
   id: number;
