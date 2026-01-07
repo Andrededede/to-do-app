@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { Task } from "../../../models/Task";
+import type { Task } from "../../../../models/Task";
 import { Trash2, CheckCircle2, Circle, Pencil, Save, X } from "lucide-react";
 import "./to-do-card.css";
 

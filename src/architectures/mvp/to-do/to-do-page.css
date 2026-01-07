@@ -1,0 +1,169 @@
+.todo-container {
+  width: 100%;
+  min-height: 100vh;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--bg-gradient);
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.theme-toggle-btn {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-primary);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--bg-input);
+  transform: scale(1.1);
+  border-color: var(--primary-color);
+}
+
+.todo-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 3rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.todo-header h1 {
+  font-size: 3rem;
+  color: var(--text-primary);
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+}
+
+.header-icon {
+  color: var(--primary-color);
+  width: 45px;
+  height: 45px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-input);
+  border-radius: 50px;
+  padding: 6px;
+  padding-left: 20px;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.input-group input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 10px;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  outline: none;
+  min-width: 0;
+}
+
+.input-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.add-btn {
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.add-btn:hover {
+  transform: scale(1.05);
+  background-color: var(--primary-hover);
+}
+
+.success-message {
+  color: var(--primary-color);
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  height: 20px;
+}
+
+.empty-msg {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 40px;
+  font-size: 1.1rem;
+}
+
+.tasks-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 10px;
+  padding: 0 5px;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  transform: scale(1.1);
+}
+
+.filter-btn.active {
+  color: var(--primary-color);
+  background-color: var(--bg-input);
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 200, 83, 0.2);
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 700px;
+  gap: 12px;
+}
